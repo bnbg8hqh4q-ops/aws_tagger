@@ -1,0 +1,35 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-12 col-xl-8">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Protera AWS Tagger</h5>
+        <p class="mb-0">Manage encrypted AWS profiles, browse instances by region, upload ID lists, and apply tags in bulk.</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-xl-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h6 class="text-muted">Active profile</h6>
+        {% if active %}
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="fw-semibold">{{ active.name }}</div>
+              <div class="small text-muted">Default region: {{ active.default_region or 'us-east-1' }}</div>
+            </div>
+<!-- Retuns to routes.py (from registered bp Blueprint main and goes to tagger) -->
+            <a class="btn btn-sm btn-primary" href="{{ url_for('main.tagger') }}">Add Tags</a>
+          </div>
+        {% else %}
+          <p class="mb-2">No active profile. Create one to get started.</p>
+<!-- Retuns to routes.py (from registered bp Blueprint main and goes to add_profile) -->
+          <a class="btn btn-sm btn-primary" href="{{ url_for('main.add_profile') }}">Add Profile</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
