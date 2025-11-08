@@ -1,0 +1,6 @@
+
+body {}
+.card { border-radius: 1rem; }
+.table thead th { position: sticky; top: 0; z-index: 1; }
+#tag-chips .badge { font-size: 0.9rem; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
