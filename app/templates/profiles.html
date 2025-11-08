@@ -1,0 +1,44 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">AWS Profiles</h4>
+  <a class="btn btn-success" href="{{ url_for('main.add_profile') }}">Add Profile</a>
+</div>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Name</th>
+          <th>Default Region</th>
+          <th>Status</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+<!-- Profiles are saved in a python list. So we use For to read objects and present in the table  -->
+      {% for p in profiles %}
+        <tr>
+          <td class="fw-semibold">{{ p.name }}</td>
+          <td>{{ p.default_region or 'us-east-1' }}</td>
+          <td>
+            {% if p.is_active %}<span class="badge text-bg-primary">Active</span>{% else %}<span class="badge text-bg-secondary">Inactive</span>{% endif %}
+          </td>
+          <td class="text-end">
+<!-- This degines the 2 actions. Each action has its own route. Works YES // Optimized NO -->
+            <form class="d-inline" method="post" action="{{ url_for('main.activate_profile', pid=p.id) }}">
+              <button class="btn btn-sm btn-outline-primary" {% if p.is_active %}disabled{% endif %}>Activate</button>
+            </form>
+            <form class="d-inline ms-2" method="post" action="{{ url_for('main.delete_profile', pid=p.id) }}"
+                  onsubmit="return confirm('Delete profile {{ p.name }}?');">
+              <button class="btn btn-sm btn-outline-danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
