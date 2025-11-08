@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4 class="mb-3">Bulk Tagger</h4>
+<div class="row g-4">
+  <div class="col-12 col-xl-8">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form id="tagger-form" method="post" action="{{ url_for('main.tagger_execute') }}">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label">Region</label>
+              <select class="form-select" id="region" name="region">
+                {% for r in regions %}
+                  <option value="{{ r }}" {% if r == default_region %}selected{% endif %}>{{ r }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">Tags (Key:Value, Press Enter to add tag)</label>
+              <input id="tags-input" class="form-control" placeholder="Owner:Alice, CostCenter:1234">
+              <input type="hidden" name="tags_json" id="tags-json">
+            </div>
+          </div>
+
+          <div class="mt-3 d-flex flex-wrap gap-2" id="tag-chips"></div>
+
+          <div class="mt-4">
+            <ul class="nav nav-tabs" id="inputTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="list-tab" data-bs-toggle="tab"
+                        data-bs-target="#list-pane" type="button" role="tab">
+                  Pick from List
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="upload-tab" data-bs-toggle="tab"
+                        data-bs-target="#upload-pane" type="button" role="tab">
+                  Upload ID List
+                </button>
+              </li>
+            </ul>
+
+            <div class="tab-content border-start border-end border-bottom p-3" id="inputTabsContent">
+              <!-- LIST TAB -->
+              <div class="tab-pane fade show active" id="list-pane" role="tabpanel">
+                <div class="d-flex gap-2 mb-2">
+                  <button type="button" class="btn btn-outline-secondary" id="refresh-btn">
+                    Refresh Instances
+                  </button>
+                  <button type="button"
+                          class="btn btn-outline-danger"
+                          id="invert-btn"
+                          title="Select all instances NOT in uploaded list">
+                    Select NOT in list
+                  </button>
+                  <input class="form-control" id="filter" placeholder="Filter by ID or name">
+                </div>
+
+                <div class="table-responsive" style="max-height: 420px; overflow:auto;">
+                  <table class="table table-sm align-middle" id="instances-table">
+                    <thead class="table-light position-sticky top-0">
+                      <tr>
+                        <th style="width:32px;"><input type="checkbox" id="select-all"></th>
+                        <th>Instance ID</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>AZ</th>
+                        <th>State</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- UPLOAD TAB -->
+              <div class="tab-pane fade" id="upload-pane" role="tabpanel">
+                <div class="row g-2 align-items-end">
+                  <div class="col-md-8">
+                    <label class="form-label">Upload text file (one InstanceId per line)</label>
+                    <input type="file" class="form-control" name="file" form="upload-form" accept=".txt">
+                    <input type="hidden" name="region" value="{{ default_region }}" form="upload-form" id="upload-region">
+                  </div>
+                  <div class="col-md-4">
+                    <button class="btn btn-outline-primary w-100" type="submit" form="upload-form">
+                      Verify IDs
+                    </button>
+                  </div>
+                </div>
+                <div class="form-text mt-2">
+                  You'll see a verification screen with details before applying tags.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="selected-ids-holder"></div>
+
+          <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-primary">Apply Tags</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('main.index') }}">Cancel</a>
+          </div>
+        </form>
+
+        <form id="upload-form" method="post"
+              action="{{ url_for('main.tagger_upload') }}"
+              enctype="multipart/form-data">
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h6 class="text-muted mb-2">How it works</h6>
+        <ol class="small mb-0">
+          <li>Pick a region.</li>
+          <li>Add tags as <code>Key:Value</code> pairs.</li>
+          <li>Select instances from the list or upload IDs.</li>
+          <li>Review selection and apply tags in bulk.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
