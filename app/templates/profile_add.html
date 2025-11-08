@@ -1,0 +1,35 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h4 class="card-title mb-3">Add AWS Profile</h4>
+        <form method="post" autocomplete="off">
+          <div class="mb-3">
+            <label class="form-label">Profile Name</label>
+            <input class="form-control" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Access Key ID</label>
+            <input class="form-control" name="access_key" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Secret Access Key</label>
+            <input class="form-control" name="secret_key" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Default Region (optional)</label>
+            <input class="form-control" name="region" placeholder="e.g., us-east-1">
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary">Save</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('main.profiles') }}">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
