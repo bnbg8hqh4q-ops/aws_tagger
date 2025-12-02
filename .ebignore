@@ -1,0 +1,7 @@
+.git
+.kiro
+__pycache__
+*.pyc
+*.pyo
+app/data
+.DS_Store

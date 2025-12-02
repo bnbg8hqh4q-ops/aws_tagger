@@ -1,0 +1,9 @@
+branch-defaults:
+  default:
+    environment: aws-tagger-env
+global:
+  application_name: aws-tagger
+  default_platform: Python 3.11 running on 64bit Amazon Linux 2023
+  default_region: us-east-1
+  sc: git
+  workspace_type: Application

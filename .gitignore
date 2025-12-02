@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Flask
+instance/
+.webassets-cache
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Deployment artifacts
+app-bundle.zip
+*.zip
+
+# Temporary AWS files
+trust-policy.json
+tagging-policy.json
+codebuild-trust-policy.json
+codepipeline-trust-policy.json
+codebuild-project.json
+eb-options.json
+
+# OS
+.DS_Store
+Thumbs.db
