@@ -4,8 +4,18 @@ from .crypto_utils import decrypt
 
 #Builds the boto3 session from profile that is loaded as parameter. 
 def build_session(profile_row):
-    access_key = decrypt(profile_row.access_key_id)
-    secret_key = decrypt(profile_row.secret_access_key)
+    if profile_row.use_secrets_manager:
+        from .secrets_manager import get_profile_credentials
+        from .config import SECRETS_MANAGER_REGION
+        creds = get_profile_credentials(profile_row.name, SECRETS_MANAGER_REGION)
+        if not creds:
+            raise ValueError(f"Credentials for profile '{profile_row.name}' not found in Secrets Manager")
+        access_key = creds['access_key_id']
+        secret_key = creds['secret_access_key']
+    else:
+        access_key = decrypt(profile_row.access_key_id)
+        secret_key = decrypt(profile_row.secret_access_key)
+    
     return boto3.Session(
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_key,

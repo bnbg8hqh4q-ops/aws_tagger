@@ -1,5 +1,5 @@
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 #Needed because it will create rows and objects
 from .models import db, Profile
 #Needed to encrypt/decrypt and AWS functions
@@ -46,13 +46,29 @@ def add_profile():
         if Profile.query.filter_by(name=name).first():
             flash('Profile name already exists.', 'warning')
             return redirect(url_for('main.add_profile'))
+        
+#Feature Flag: Store credentials in Secrets Manager or encrypted in DB
+        use_sm = current_app.config['FEATURE_FLAGS']['USE_SECRETS_MANAGER']
+        if use_sm:
+            from .secrets_manager import store_profile_credentials
+            from .config import SECRETS_MANAGER_REGION
+            store_profile_credentials(name, access_key, secret_key, SECRETS_MANAGER_REGION)
+            prof = Profile(
+                name=name,
+                access_key_id='SECRETS_MANAGER',
+                secret_access_key='SECRETS_MANAGER',
+                default_region=region,
+                use_secrets_manager=True
+            )
+        else:
 #Create the profile object and save to DB
-        prof = Profile(
-            name=name,
-            access_key_id=encrypt(access_key),
-            secret_access_key=encrypt(secret_key),
-            default_region=region
-        )
+            prof = Profile(
+                name=name,
+                access_key_id=encrypt(access_key),
+                secret_access_key=encrypt(secret_key),
+                default_region=region,
+                use_secrets_manager=False
+            )
 #SQLAlchemy add and commit Palo Alto stype with push and commit
         db.session.add(prof)
         db.session.commit()
@@ -75,6 +91,10 @@ def activate_profile(pid):
 @bp.route('/profiles/delete/<int:pid>', methods=['POST'])
 def delete_profile(pid):
     p = Profile.query.get_or_404(pid)
+    if p.use_secrets_manager:
+        from .secrets_manager import delete_profile_credentials
+        from .config import SECRETS_MANAGER_REGION
+        delete_profile_credentials(p.name, SECRETS_MANAGER_REGION)
     db.session.delete(p)
     db.session.commit()
     flash('Profile deleted.', 'info')

@@ -12,3 +12,4 @@ class Profile(db.Model):
     secret_access_key = db.Column(db.String(256), nullable=False)
     default_region = db.Column(db.String(32), nullable=True)
     is_active = db.Column(db.Boolean, default=False)
+    use_secrets_manager = db.Column(db.Boolean, default=False)  # Flag to indicate if credentials are in Secrets Manager

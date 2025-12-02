@@ -1,6 +1,7 @@
 
 import os, secrets
 from flask import Flask
+from .config import FEATURE_FLAGS, SECRETS_MANAGER_REGION, FLASK_SECRET_NAME
 
 #Flask Object Creation Function
 
@@ -10,19 +11,29 @@ def create_app():
 #Create data directory with db, keu and flask key
     data_dir = os.path.join(os.path.dirname(__file__), "data")
     os.makedirs(data_dir, exist_ok=True)
-#We try to get the key from Env variable.
-    key_file = os.path.join(data_dir, "flask_secret.key")
-    key = os.environ.get("FLASK_SECRET_KEY") 
-#If we do not have in ENV, then read key for existing file. If empty then create one (secrets.token_hex)
-    if not key:
-        if os.path.exists(key_file):
-            with open(key_file, "r") as f:
-                key = f.read().strip()
-        else:
+    
+#Feature Flag: Use Secrets Manager for Flask Secret Key
+    if FEATURE_FLAGS['USE_SECRETS_MANAGER']:
+        from .secrets_manager import get_secret, create_secret
+        key = get_secret(FLASK_SECRET_NAME, SECRETS_MANAGER_REGION)
+        if not key:
             key = secrets.token_hex(32)
-            with open(key_file, "w") as f:
-                f.write(key)
+            create_secret(FLASK_SECRET_NAME, key, SECRETS_MANAGER_REGION)
+    else:
+#We try to get the key from Env variable.
+        key_file = os.path.join(data_dir, "flask_secret.key")
+        key = os.environ.get("FLASK_SECRET_KEY") 
+#If we do not have in ENV, then read key for existing file. If empty then create one (secrets.token_hex)
+        if not key:
+            if os.path.exists(key_file):
+                with open(key_file, "r") as f:
+                    key = f.read().strip()
+            else:
+                key = secrets.token_hex(32)
+                with open(key_file, "w") as f:
+                    f.write(key)
     app.config["SECRET_KEY"] = key
+    app.config["FEATURE_FLAGS"] = FEATURE_FLAGS
 
 ###SQLAlchemy Configuration###
 
