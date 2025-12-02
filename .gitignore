@@ -36,6 +36,10 @@ codebuild-trust-policy.json
 codepipeline-trust-policy.json
 codebuild-project.json
 eb-options.json
+pipeline-config.json
+
+# Kiro IDE
+.kiro/
 
 # OS
 .DS_Store
