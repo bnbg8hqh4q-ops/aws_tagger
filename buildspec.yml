@@ -19,4 +19,3 @@ phases:
 artifacts:
   files:
     - '**/*'
-  name: app-bundle-$(date +%Y%m%d-%H%M%S).zip
